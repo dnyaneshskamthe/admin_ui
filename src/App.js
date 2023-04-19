@@ -23,12 +23,12 @@ const App = () => {
 
   return (
     <>
-    <div className='container container-fluide'>
+    <div className='container container-fluid'>
       <div className='d-flex flex-column justify-content-center align-items-center text-center'>
         <p style={{fontSize:"2rem"}}>Admin UI</p>
         {loading  ? <p className='text-muted'>Loading...</p> : 
-        <div className='table table-responsive' style={{ width: '100%', height: '90%' }}>
-          { membersData && <AdminTable mData = { membersData}/> }
+        <div className='table table-sm  table-responsive'>
+          { membersData && <AdminTable mData = { membersData}/>}
         </div>}
       </div>
     </div>

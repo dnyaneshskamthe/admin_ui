@@ -2,8 +2,8 @@ import react, { useEffect, useState } from "react";
 import { Pagination } from "react-bootstrap";
 
 function AdminTable(props) {
-    const mData = props.mData;
-  const [data,setData] = useState(mData);
+  const mData = props.mData;
+  const [data, setData] = useState(mData);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRows, setSelectedRows] = useState([]);
 
@@ -35,27 +35,32 @@ function AdminTable(props) {
 
   const handleSelectAll = (event) => {
     if (event.target.checked) {
-      const currentPageRows = mData.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage);
-      setSelectedRows(currentPageRows.map(row => row.id));
+      const currentPageRows = mData.slice(
+        (currentPage - 1) * entriesPerPage,
+        currentPage * entriesPerPage
+      );
+      setSelectedRows(currentPageRows.map((row) => row.id));
     } else {
       setSelectedRows([]);
     }
-  }
+  };
 
   const handleDeleteSelected = () => {
-    const remainingRows = filteredData.filter((row) => !selectedRows.includes(row.id));
-    setData(remainingRows)
+    const remainingRows = filteredData.filter(
+      (row) => !selectedRows.includes(row.id)
+    );
+    setData(remainingRows);
     setSelectedRows([]);
   };
 
-//   useEffect(()=>{},[mData,data])
+  //   useEffect(()=>{},[mData,data])
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div className="d-flex flex-column">
         <div>
           <input
-            className="mb-2"
+            className="mb-2 rounded"
             type="text"
             placeholder="Search by name, email, or role"
             value={searchQuery}
@@ -63,11 +68,11 @@ function AdminTable(props) {
             style={{ width: "100%" }}
           />
         </div>
-        <table className="table" style={{ width: "100%" }}>
+        <table className="table table-sm">
           <thead>
             <tr>
               <th scope="col">
-                <input type="checkbox" onChange={handleSelectAll}/>
+                <input type="checkbox" onChange={handleSelectAll} />
               </th>
               <th scope="col">Name</th>
               <th scope="col">Email</th>
@@ -78,16 +83,20 @@ function AdminTable(props) {
           <tbody>
             {currentData.map((member, index) => (
               <tr
-              key={member.id}
-              style={selectedRows.includes(member.id) ? { backgroundColor: '#e6e6e6' } : {}}
-            >
-              <td>
-                <input
-                  type="checkbox"
-                  checked={selectedRows.includes(member.id)}
-                  onChange={() => handleRowSelect(member.id)}
-                />
-              </td>
+                key={member.id}
+                style={
+                  selectedRows.includes(member.id)
+                    ? { backgroundColor: "#e6e6e6" }
+                    : {}
+                }
+              >
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.includes(member.id)}
+                    onChange={() => handleRowSelect(member.id)}
+                  />
+                </td>
                 <td>{member.name}</td>
                 <td>{member.email}</td>
                 <td>{member.role}</td>
@@ -105,42 +114,50 @@ function AdminTable(props) {
           </tbody>
         </table>
         <div className="d-flex justify-content-between ms-2">
-            <div>
-            <button className="btn btn-danger btn-sm" onClick={handleDeleteSelected} disabled={selectedRows.length === 0}>Delete Selected</button>
-            </div>
-        <Pagination>
-          <Pagination.First
-            onClick={() => setCurrentPage(1)}
-            disabled={currentPage === 1}
-          />
-          <Pagination.Prev
-            disabled={currentPage === 1}
-            onClick={() => handlePageClick(currentPage - 1)}
-          />
-          {[
-            ...Array(Math.ceil(filteredData.length / entriesPerPage)).keys(),
-          ].map((pageNumber) => (
-            <Pagination.Item
-              key={pageNumber + 1}
-              active={pageNumber + 1 === currentPage}
-              onClick={() => handlePageClick(pageNumber + 1)}
+          <div>
+            <button
+              className="btn btn-danger btn-sm"
+              onClick={handleDeleteSelected}
+              disabled={selectedRows.length === 0}
             >
-              {pageNumber + 1}
-            </Pagination.Item>
-          ))}
-          <Pagination.Next
-            disabled={currentPage === Math.ceil(filteredData.length / entriesPerPage)}
-            onClick={() => handlePageClick(currentPage + 1)}
-          />
-          <Pagination.Last
-            onClick={() =>
-              setCurrentPage(Math.ceil(filteredData.length / entriesPerPage))
-            }
-            disabled={
-              currentPage === Math.ceil(filteredData.length / entriesPerPage)
-            }
-          />
-        </Pagination>
+              Delete Selected
+            </button>
+          </div>
+          <Pagination>
+            <Pagination.First
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            />
+            <Pagination.Prev
+              disabled={currentPage === 1}
+              onClick={() => handlePageClick(currentPage - 1)}
+            />
+            {[
+              ...Array(Math.ceil(filteredData.length / entriesPerPage)).keys(),
+            ].map((pageNumber) => (
+              <Pagination.Item
+                key={pageNumber + 1}
+                active={pageNumber + 1 === currentPage}
+                onClick={() => handlePageClick(pageNumber + 1)}
+              >
+                {pageNumber + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              disabled={
+                currentPage === Math.ceil(filteredData.length / entriesPerPage)
+              }
+              onClick={() => handlePageClick(currentPage + 1)}
+            />
+            <Pagination.Last
+              onClick={() =>
+                setCurrentPage(Math.ceil(filteredData.length / entriesPerPage))
+              }
+              disabled={
+                currentPage === Math.ceil(filteredData.length / entriesPerPage)
+              }
+            />
+          </Pagination>
         </div>
       </div>
     </>
