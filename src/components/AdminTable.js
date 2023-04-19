@@ -1,10 +1,9 @@
-import { useState } from 'react';
-import { Pagination } from 'react-bootstrap';
-
+import react, { useEffect, useState } from "react";
+import { Pagination } from "react-bootstrap";
 
 function AdminTable(props) {
-    const data = props.mData;
-  const [searchQuery, setSearchQuery] = useState('');
+  const data = props.mData;
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredData = data.filter((member) => {
     const searchValue = searchQuery.toLowerCase();
@@ -16,65 +15,97 @@ function AdminTable(props) {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const [entriesPerPage, setEntriesPerPage] = useState(10);
 
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  const handlePageClick = (pageNumber) => setCurrentPage(pageNumber);
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentData = data.slice(startIndex, endIndex);
+  const startIndex = (currentPage - 1) * entriesPerPage;
+  const endIndex = startIndex + entriesPerPage;
+  const currentData = filteredData.slice(startIndex, endIndex);
+
+  // Initialize counter to 1 for the Sr column
+  let srCounter = 1;
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div>
-        <input
-          className='mb-2'
-          type="text"
-          placeholder="Search by name, email, or role"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ width: '100%' }}
-        />
-      </div>
-      <table className="table" style={{ width: '100%' }}>
-        <thead>
-          <tr>
-            <th scope="col">Sr</th>
-            <th scope="col">Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Role</th>
-            <th scope="col">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredData.map((member, index) => (
-            <tr key={index}>
-              <th scope="row">{index + 1}</th>
-              <td>{member.name}</td>
-              <td>{member.email}</td>
-              <td>{member.role}</td>
-              <td>
-                <span className="material-icons-outlined">edit_note</span>
-                <span style={{ color: 'red' }} className="material-icons-outlined">delete</span>
-              </td>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <div>
+          <input
+            className="mb-2"
+            type="text"
+            placeholder="Search by name, email, or role"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: "100%" }}
+          />
+        </div>
+        <table className="table" style={{ width: "100%" }}>
+          <thead>
+            <tr>
+              <th scope="col">Sr</th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Role</th>
+              <th scope="col">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className='d-flex justify-content-center'>
-        <Pagination className='mt-3'>
-          <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
-          {Array.from({ length: totalPages }, (_, index) => (
-            <Pagination.Item key={index} active={index + 1 === currentPage} onClick={() => handlePageChange(index + 1)}>
-              {index + 1}
+          </thead>
+          <tbody>
+            {currentData.map((member, index) => (
+              <tr key={member.id}>
+                {" "}
+                {/* Use a unique identifier for the key */}
+                <th scope="row">{startIndex + index + 1}</th>{" "}
+                {/* Increment the counter */}
+                <td>{member.name}</td>
+                <td>{member.email}</td>
+                <td>{member.role}</td>
+                <td>
+                  <span className="material-icons-outlined">edit_note</span>
+                  <span
+                    style={{ color: "red" }}
+                    className="material-icons-outlined"
+                  >
+                    delete
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <Pagination>
+          <Pagination.First
+            onClick={() => setCurrentPage(1)}
+            disabled={currentPage === 1}
+          />
+          <Pagination.Prev
+            disabled={currentPage === 1}
+            onClick={() => handlePageClick(currentPage - 1)}
+          />
+          {[
+            ...Array(Math.ceil(filteredData.length / entriesPerPage)).keys(),
+          ].map((pageNumber) => (
+            <Pagination.Item
+              key={pageNumber + 1}
+              active={pageNumber + 1 === currentPage}
+              onClick={() => handlePageClick(pageNumber + 1)}
+            >
+              {pageNumber + 1}
             </Pagination.Item>
           ))}
-          <Pagination.Next onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} />
+          <Pagination.Next
+            disabled={currentPage === Math.ceil(filteredData.length / entriesPerPage)}
+            onClick={() => handlePageClick(currentPage + 1)}
+          />
+          <Pagination.Last
+            onClick={() =>
+              setCurrentPage(Math.ceil(filteredData.length / entriesPerPage))
+            }
+            disabled={
+              currentPage === Math.ceil(filteredData.length / entriesPerPage)
+            }
+          />
         </Pagination>
-        </div>
-    </div>
+      </div>
     </>
   );
 }
