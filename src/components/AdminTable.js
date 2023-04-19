@@ -2,8 +2,10 @@ import react, { useEffect, useState } from "react";
 import { Pagination } from "react-bootstrap";
 
 function AdminTable(props) {
-  const data = props.mData;
+    const mData = props.mData;
+  const [data,setData] = useState(mData);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const filteredData = data.filter((member) => {
     const searchValue = searchQuery.toLowerCase();
@@ -23,8 +25,30 @@ function AdminTable(props) {
   const endIndex = startIndex + entriesPerPage;
   const currentData = filteredData.slice(startIndex, endIndex);
 
-  // Initialize counter to 1 for the Sr column
-  let srCounter = 1;
+  const handleRowSelect = (id) => {
+    if (selectedRows.includes(id)) {
+      setSelectedRows(selectedRows.filter((rowId) => rowId !== id));
+    } else {
+      setSelectedRows([...selectedRows, id]);
+    }
+  };
+
+  const handleSelectAll = (event) => {
+    if (event.target.checked) {
+      const currentPageRows = mData.slice((currentPage - 1) * entriesPerPage, currentPage * entriesPerPage);
+      setSelectedRows(currentPageRows.map(row => row.id));
+    } else {
+      setSelectedRows([]);
+    }
+  }
+
+  const handleDeleteSelected = () => {
+    const remainingRows = filteredData.filter((row) => !selectedRows.includes(row.id));
+    setData(remainingRows)
+    setSelectedRows([]);
+  };
+
+//   useEffect(()=>{},[mData,data])
 
   return (
     <>
@@ -42,7 +66,9 @@ function AdminTable(props) {
         <table className="table" style={{ width: "100%" }}>
           <thead>
             <tr>
-              <th scope="col">Sr</th>
+              <th scope="col">
+                <input type="checkbox" onChange={handleSelectAll}/>
+              </th>
               <th scope="col">Name</th>
               <th scope="col">Email</th>
               <th scope="col">Role</th>
@@ -51,11 +77,17 @@ function AdminTable(props) {
           </thead>
           <tbody>
             {currentData.map((member, index) => (
-              <tr key={member.id}>
-                {" "}
-                {/* Use a unique identifier for the key */}
-                <th scope="row">{startIndex + index + 1}</th>{" "}
-                {/* Increment the counter */}
+              <tr
+              key={member.id}
+              style={selectedRows.includes(member.id) ? { backgroundColor: '#e6e6e6' } : {}}
+            >
+              <td>
+                <input
+                  type="checkbox"
+                  checked={selectedRows.includes(member.id)}
+                  onChange={() => handleRowSelect(member.id)}
+                />
+              </td>
                 <td>{member.name}</td>
                 <td>{member.email}</td>
                 <td>{member.role}</td>
@@ -72,6 +104,10 @@ function AdminTable(props) {
             ))}
           </tbody>
         </table>
+        <div className="d-flex justify-content-between ms-2">
+            <div>
+            <button className="btn btn-danger btn-sm" onClick={handleDeleteSelected} disabled={selectedRows.length === 0}>Delete Selected</button>
+            </div>
         <Pagination>
           <Pagination.First
             onClick={() => setCurrentPage(1)}
@@ -105,6 +141,7 @@ function AdminTable(props) {
             }
           />
         </Pagination>
+        </div>
       </div>
     </>
   );
